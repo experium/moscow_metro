@@ -22,6 +22,9 @@
     "url": "http://github.com/philosophocat/moscow_metro.git"
   },
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "@types/node": "^10.12.18",
     "ts-loader": "^5.3.3",
