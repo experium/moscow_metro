@@ -64,12 +64,14 @@ const throttle = (fn: (...args: any[]) => void, wait: number) => {
 };
 
 const preventTextSelection = () => {
-    if (window.getSelection && window.getSelection().empty) {
-        return window.getSelection().empty();
+    if (window.getSelection && (window.getSelection() || {}).empty) {
+        let selection = window.getSelection();
+        return selection && selection.empty();
     }
 
-    if (window.getSelection && window.getSelection().removeAllRanges) {
-        return window.getSelection().removeAllRanges();
+    if (window.getSelection && (window.getSelection()|| {}).removeAllRanges) {
+        let selection = window.getSelection();
+        return selection && selection.removeAllRanges();
     }
 
     if (document.selection) { document.selection.empty(); }
@@ -96,6 +98,10 @@ const closestByClassName = (el: HTMLElement, className: string): HTMLElement | n
     if (hasClass(el, className)) { return el; }
     if (document.body.isEqualNode(el)) { return null; }
     return closestByClassName(el.parentNode as HTMLElement, className);
+};
+
+const getElementsByClassName = (el: HTMLElement, className: string): any => {
+    return document.querySelectorAll('.' + className);
 };
 
 export default class App {
@@ -248,7 +254,7 @@ export default class App {
         if (classNamesToHide.length) {
             for (const i of classNamesToHide) {
                 Array
-                    .from(this.schema.getElementsByClassName(`st${i}`) as HTMLCollectionOf<HTMLElement>)
+                    .from(getElementsByClassName(this.schema, `st${i}`) as HTMLCollectionOf<HTMLElement>)
                     .map((item: HTMLElement) => {
                         item.style.display = 'none';
                     });
@@ -359,8 +365,8 @@ export default class App {
             const { element } = station;
             const texts = element.getElementsByTagName('text') as HTMLCollectionOf<SVGTextElement>;
             const text: any = texts[0];
-            const substrate = element.getElementsByClassName('moscow_metro_map__substrate')[0] as HTMLElement;
-            const area = element.getElementsByClassName('moscow_metro_map__area')[0] as HTMLElement;
+            const substrate = getElementsByClassName(element, 'moscow_metro_map__substrate')[0] as HTMLElement;
+            const area = getElementsByClassName(element, 'moscow_metro_map__area')[0] as HTMLElement;
             const bounds = text.getBBox();
             const width = Math.ceil(bounds.width);
             const height = Math.ceil(bounds.height);
@@ -372,7 +378,7 @@ export default class App {
     }
 
     private getStations = () => Array
-        .from(this.schema.getElementsByClassName('moscow_metro_map__station') as HTMLCollectionOf<HTMLElement>)
+        .from(getElementsByClassName(this.schema, 'moscow_metro_map__station') as HTMLCollectionOf<HTMLElement>)
         .map((element: HTMLElement) => ({
             element,
             id: parseInt(element.getAttribute('data-id') || '0', 10),
@@ -383,7 +389,7 @@ export default class App {
         }))
 
     private getChecks = () => Array
-        .from(this.schema.getElementsByClassName('moscow_metro_map__check') as HTMLCollectionOf<HTMLElement>)
+        .from(getElementsByClassName(this.schema, 'moscow_metro_map__check') as HTMLCollectionOf<HTMLElement>)
         .map((element: HTMLElement) => ({
             element,
             id: parseInt(element.getAttribute('data-id') || '0', 10),
